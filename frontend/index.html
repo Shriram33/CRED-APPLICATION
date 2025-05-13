@@ -14,7 +14,7 @@
     document.getElementById('nameForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const name = document.getElementById('nameInput').value;
-      const response = await fetch('http://<your-backend-ip>:3000/names', {
+      const response = await fetch('http://54.175.145.158:3000/names', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
