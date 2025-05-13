@@ -1,5 +1,6 @@
 # CRED APPLICATION
-### Folder Structure
+
+**Folder Structure**
 
 
 
