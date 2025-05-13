@@ -2,6 +2,9 @@
 ### Folder Structure
 
 
+
+
+
 3-tier-app/
 ├── backend/
 │   ├── Dockerfile
@@ -11,6 +14,8 @@
 │   ├── Dockerfile
 │   └── index.html
 ├── docker-compose.yml
+
+
 
 
 
