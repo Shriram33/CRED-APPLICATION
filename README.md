@@ -16,7 +16,7 @@
 ├── docker-compose.yml
 ```
 
-### If you are not using any cloud service provder then you can use docker compose file ```docker-compose.yml```
+** If you are not using any cloud service provder then you can use docker compose file ```docker-compose.yml``` **
 
 ```
 version: '3'
