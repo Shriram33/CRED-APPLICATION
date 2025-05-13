@@ -16,7 +16,7 @@
 ├── docker-compose.yml
 ```
 
-** If you are not using any cloud service provder then you can use docker compose file ```docker-compose.yml``` **
+**If you are not using any cloud service provder then you can use docker compose file ```docker-compose.yml```**
 
 ```
 version: '3'
@@ -45,7 +45,7 @@ services:
 ```
 
 
-### After starting the containers, connect to the PostgreSQL container and run:
+**After starting the containers, connect to the PostgreSQL container and run:**
 ```
 CREATE TABLE names (
 id SERIAL PRIMARY KEY,
