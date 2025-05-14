@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14 # Update with the version you're using
+    commands:
+      - echo Installing dependencies...
+      # If you have a package.json in your project
+      - npm install
+  build:
+    commands:
+      - echo Building the frontend...
+      # If you need to compile or process your assets (e.g., with Webpack, etc.)
+      - echo No build process required for a simple HTML page.
+  post_build:
+    commands:
+      - echo Build completed successfully.
+
+artifacts:
+  files:
+    - '**/*'  # Include all files in your project directory
+
+cache:
+  paths:
+    - 'node_modules/**/*'
