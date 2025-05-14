@@ -55,7 +55,5 @@ CREATE TABLE users (
   email VARCHAR(150) NOT NULL UNIQUE,
   dob DATE NOT NULL
 );
-
-***For health chaeck of backend servers run ```http://<public-ip>:3000/health```***
-
 ```
+***For health chaeck of backend servers run```http://<public-ip>:3000/health```***
