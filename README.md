@@ -48,8 +48,14 @@ services:
 
 **After starting the containers, connect to the PostgreSQL container and run:**
 ```
-CREATE TABLE names (
-id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  dob DATE NOT NULL
 );
+
+***For health chaeck of backend servers run ```http://<public-ip>:3000/health```***
+
 ```
