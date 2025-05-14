@@ -73,7 +73,7 @@
       font-weight: bold;
     }
 
-    #dob {
+    #dob, #email {
       display: none;
     }
   </style>
@@ -85,6 +85,7 @@
     <form id="userForm">
       <input type="text" id="username" placeholder="Username" required />
       <input type="password" id="password" placeholder="Password" required />
+      <input type="email" id="email" placeholder="Email" />
       <input type="date" id="dob" />
 
       <div class="btn-group">
@@ -107,20 +108,10 @@
     const submitBtn = document.getElementById('submitBtn');
     const formTitle = document.getElementById('formTitle');
     const dobField = document.getElementById('dob');
+    const emailField = document.getElementById('email');
     const toggleMessage = document.getElementById('toggleMessage');
 
     let mode = 'login'; // or 'register'
-
-    window.onload = () => {
-      const storedUser = localStorage.getItem('loginData');
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        document.getElementById('username').value = user.username;
-        document.getElementById('password').value = user.password;
-        messageEl.innerText = "Welcome back, " + user.username + "! Click login to continue.";
-        messageEl.style.color = "green";
-      }
-    };
 
     toggleBtn.addEventListener('click', () => {
       if (mode === 'login') {
@@ -129,6 +120,7 @@
         submitBtn.innerText = 'Register';
         toggleBtn.innerText = 'Switch to Login';
         dobField.style.display = 'block';
+        emailField.style.display = 'block';
         toggleMessage.innerText = "Already have an account? Please use Login";
       } else {
         mode = 'login';
@@ -136,6 +128,7 @@
         submitBtn.innerText = 'Login';
         toggleBtn.innerText = 'Switch to Register';
         dobField.style.display = 'none';
+        emailField.style.display = 'none';
         toggleMessage.innerText = "If you are not registered yet";
       }
     });
@@ -145,9 +138,10 @@
 
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
+      const email = document.getElementById('email').value.trim();
       const dob = document.getElementById('dob').value;
 
-      if (!username || !password || (mode === 'register' && !dob)) {
+      if (!username || !password || (mode === 'register' && (!dob || !email))) {
         messageEl.innerText = "Please fill in all required fields.";
         messageEl.style.color = "red";
         return;
@@ -158,7 +152,10 @@
         : 'http://54.205.156.43:3000/register';
 
       const payload = { username, password };
-      if (mode === 'register') payload.dob = dob;
+      if (mode === 'register') {
+        payload.email = email;
+        payload.dob = dob;
+      }
 
       try {
         const response = await fetch(endpoint, {
@@ -170,13 +167,10 @@
         const msg = await response.text();
 
         if (response.ok) {
+          messageEl.innerText = msg;
+          messageEl.style.color = mode === 'login' ? "green" : "blue";
           if (mode === 'login') {
             localStorage.setItem('loginData', JSON.stringify({ username, password }));
-            messageEl.innerText = `Welcome, ${username}!`;
-            messageEl.style.color = "green";
-          } else {
-            messageEl.innerText = "Registration successful! You can now log in.";
-            messageEl.style.color = "blue";
           }
         } else {
           messageEl.innerText = msg || "Something went wrong.";
