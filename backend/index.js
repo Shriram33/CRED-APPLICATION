@@ -9,7 +9,7 @@ const port = 3000;
 // PostgreSQL connection
 const pool = new Pool({
   user: 'postgres',
-  host: 'db', // Docker Compose service name for the database
+  host: 'db', // use 'localhost' if not using Docker
   database: 'customers',
   password: 'postgres',
   port: 5432,
@@ -19,66 +19,48 @@ const pool = new Pool({
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- POST /names: Store a name ---
-app.post('/names', async (req, res) => {
-  const { name } = req.body;
-
-  console.log("Received POST /names with:", name);
-
+// --- Health check ---
+app.get('/health', async (req, res) => {
   try {
-    const result = await pool.query(
-      'INSERT INTO names (name) VALUES ($1) RETURNING *',
-      [name]
-    );
-    res.send(`Name "${result.rows[0].name}" stored successfully.`);
+    await pool.query('SELECT 1'); // check DB connection
+    res.send('Backend and DB are healthy');
   } catch (err) {
-    console.error("Error inserting name:", err);
-    res.status(500).send('Error saving name');
+    console.error("Health check DB error:", err);
+    res.status(500).send('Backend is up, but DB connection failed');
   }
 });
 
-// --- GET /names: Return today's date ---
-app.get('/names', (req, res) => {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    res.send(`Today's date is ${today}`);
-  } catch (err) {
-    console.error("Error generating date:", err);
-    res.status(500).send('Error retrieving date');
-  }
-});
-
-// --- POST /register: Create a new user ---
+// --- POST /register ---
 app.post('/register', async (req, res) => {
-  const { username, password, dob } = req.body;
+  const { username, password, email, dob } = req.body;
 
-  if (!username || !password || !dob) {
+  if (!username || !password || !email || !dob) {
     return res.status(400).send('All fields are required');
   }
 
   try {
-    const existing = await pool.query(
-      'SELECT * FROM users WHERE username = $1',
-      [username]
+    const existingUser = await pool.query(
+      'SELECT * FROM users WHERE username = $1 OR email = $2',
+      [username, email]
     );
 
-    if (existing.rows.length > 0) {
-      return res.status(400).send('Username already exists');
+    if (existingUser.rows.length > 0) {
+      return res.status(400).send('Username or email already exists');
     }
 
     await pool.query(
-      'INSERT INTO users (username, password, dob) VALUES ($1, $2, $3)',
-      [username, password, dob]
+      'INSERT INTO users (username, password, email, dob) VALUES ($1, $2, $3, $4)',
+      [username, password, email, dob]
     );
 
-    res.send('User registered successfully');
+    res.send('Registration successful! You can now log in.');
   } catch (err) {
     console.error("Error registering user:", err);
-    res.status(500).send('Error registering user');
+    res.status(500).send('Server error during registration');
   }
 });
 
-// --- POST /login: Authenticate user ---
+// --- POST /login ---
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -98,8 +80,37 @@ app.post('/login', async (req, res) => {
 
     res.send(`Login successful. Welcome, ${username}!`);
   } catch (err) {
-    console.error("Error logging in:", err);
-    res.status(500).send('Error during login');
+    console.error("Error during login:", err);
+    res.status(500).send('Server error during login');
+  }
+});
+
+// --- POST /names ---
+app.post('/names', async (req, res) => {
+  const { name } = req.body;
+
+  console.log("Received POST /names with:", name);
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO names (name) VALUES ($1) RETURNING *',
+      [name]
+    );
+    res.send(`Name "${result.rows[0].name}" stored successfully.`);
+  } catch (err) {
+    console.error("Error inserting name:", err);
+    res.status(500).send('Error saving name');
+  }
+});
+
+// --- GET /names ---
+app.get('/names', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM names');
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching names:", err);
+    res.status(500).send('Error retrieving names');
   }
 });
 
