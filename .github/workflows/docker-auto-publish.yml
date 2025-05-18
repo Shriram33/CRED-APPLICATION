@@ -6,7 +6,7 @@ on:
       - 'backend/**'
       - 'frontend/**'
     branches:
-      - main
+      - dev
 
 env:
   DOCKERHUB_USERNAME: alioth360
